@@ -11,6 +11,11 @@ const tasks = [
     id: "2",
     isCompleted: true,
     description: "Take breakfast"
+  },
+  {
+    id: "3",
+    isCompleted: false,
+    description: "Go to the gym"
   }
 ];
 
