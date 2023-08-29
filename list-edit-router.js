@@ -1,5 +1,12 @@
+const express = require('express');
+const router = express.Router();
+
 // Crear una tarea
-listEditRouter.post('/create', (req, res) => {
+router.post('/create', (req, res, next) => {
+  if (!req.body.description) {
+    return res.status(400).send("Descripción de tarea vacía");
+  }
+
   const newTask = {
     id: generateNewId(),
     isCompleted: false,
@@ -10,7 +17,7 @@ listEditRouter.post('/create', (req, res) => {
 });
 
 // Actualizar una tarea
-listEditRouter.put('/update/:id', (req, res) => {
+router.put('/update/:id', (req, res, next) => {
   const taskId = req.params.id;
   const updatedDescription = req.body.description;
   const taskToUpdate = tasks.find(task => task.id === taskId);
@@ -23,7 +30,7 @@ listEditRouter.put('/update/:id', (req, res) => {
 });
 
 // Eliminar una tarea
-listEditRouter.delete('/delete/:id', (req, res) => {
+router.delete('/delete/:id', (req, res, next) => {
   const taskId = req.params.id;
   const taskIndex = tasks.findIndex(task => task.id === taskId);
   if (taskIndex !== -1) {
@@ -33,3 +40,5 @@ listEditRouter.delete('/delete/:id', (req, res) => {
     res.status(404).json({ message: 'Tarea no encontrada' });
   }
 });
+
+module.exports = router;
