@@ -1,11 +1,20 @@
 const express = require('express');
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 const app = express();
 const listViewRouter = require('./list-view-router');
 const listEditRouter = require('./list-edit-router');
 
+dotenv.config();
+
 app.use(express.json());
 app.use('/list-view', listViewRouter);
 app.use('/list-edit', listEditRouter);
+
+const users = [
+  { username: 'usuario1', password: 'contrasena1' },
+  { username: 'usuario2', password: 'contrasena2' },
+];
 
 const tasks = [
     {
@@ -35,6 +44,36 @@ app.use((req, res, next) => {
   }
 
   next();
+});
+
+
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  const user = users.find((user) => user.username === username && user.password === password);
+
+  if (!user) {
+    return res.status(401).json({ message: 'Credenciales inválidas' });
+  }
+
+  const token = jwt.sign({ username }, process.env.JWT_SECRET);
+
+  res.json({ token });
+});
+
+app.get('/protected', (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token no proporcionado' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ message: 'Acceso autorizado' });
+  } catch (error) {
+    res.status(401).json({ message: 'Token inválido' });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
